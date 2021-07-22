@@ -1,23 +1,31 @@
 package stepdefinitions;
 
+
+import static org.junit.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.ResponseSpecification;
+import junit.framework.Assert;
 import resources.Resouces;
 import resources.TestDataBuild;
 import resources.Utility;
 import static io.restassured.RestAssured.given;
 
+
 import java.io.FileNotFoundException;
 
 public class Stepdefs extends Utility {
-	
+	ResponseSpecification resspec;
 	RequestSpecification res;
 	TestDataBuild data =new TestDataBuild();
 	Response response;
+	static String place_id;
 	
 	
 	
@@ -34,6 +42,8 @@ public class Stepdefs extends Utility {
 	@When("user calls {string} with {string} http request")
 	public void user_calls_with_http_request(String resource, String crudmethod) {
 		
+		
+		resspec =new ResponseSpecBuilder().expectStatusCode(200).expectContentType(ContentType.JSON).build();
 		Resouces apiresources=	Resouces.valueOf(resource);
 		
 	   System.out.println(apiresources.getresouces());
@@ -52,21 +62,30 @@ public class Stepdefs extends Utility {
 
 	@Then("api call got sucess with status code {int}")
 	public void api_call_got_sucess_with_status_code(Integer int1) {
-	    
+//Assert.assertEquals(response.getStatusCode(),200);
+
+assertEquals(response.getStatusCode(),200);
 	}
 
 	@Then("{string} in response body is {string}")
-	public void in_response_body_is(String string, String string2) {
+	public void in_response_body_is(String keyvalue, String Expectedvalue) {
+		
+		 assertEquals(getjsonpath(response,keyvalue),Expectedvalue);
 	  
 	}
 
-	@Then("scope in response body is {string}")
-	public void scope_in_response_body_is(String string) {
-	    
-	}
-
+	
 	@Then("verify place_Id created maps to {string} using {string}")
-	public void verify_place_Id_created_maps_to_using(String string, String string2) {
+	public void verify_place_Id_created_maps_to_using(String expectedName, String resource) throws FileNotFoundException {
+		
+		 place_id=getjsonpath(response,"place_id");
+		 res=given().spec(requestspecification()).queryParam("place_id",place_id);
+		 user_calls_with_http_request(resource,"GET");
+		 String actualname=getjsonpath(response,"name");
+		 assertEquals(actualname,expectedName);
+		 
+		
+		
 	   
 	}
 

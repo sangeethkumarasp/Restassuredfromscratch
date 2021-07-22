@@ -5,7 +5,9 @@ public  enum  Resouces {
 	
 	
 	addplaceapi("/maps/api/place/add/json"),
+	getPlaceAPI("/maps/api/place/get/json"),
 Deleteapi("/maps/api/place/delete/json");
+	
 	
 	
 	private String resource;
